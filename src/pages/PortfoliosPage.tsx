@@ -122,7 +122,7 @@ export function PortfoliosPage() {
               </div>
               <div>
                 <label className="label" htmlFor="startingCash">Starting cash</label>
-                <input id="startingCash" className="input" type="number" min="1" step="100"
+                <input id="startingCash" className="input" type="number" min="1" step="any"
                   value={startingCash} onChange={(e) => setStartingCash(e.target.value)} required />
               </div>
             </div>

@@ -14,6 +14,7 @@ export interface UserProfile {
   id: string;
   owner?: string | null;
   email: string;
+  stripeCustomerId?: string | null;
   subscriptionStatus: string;
   subscriptionEndDate?: string | null;
   subscriptionProvider?: string | null;
@@ -165,12 +166,24 @@ const mutations = {
     (_client as any).mutations.refreshPrices(args) as Promise<{
       data: { ok: boolean | null; updatedCount: number | null; error: string | null } | null;
     }>,
+  stripeCancelSubscription: () =>
+    (_client as any).mutations.stripeCancelSubscription({}) as Promise<{
+      data: { ok: boolean | null; error: string | null } | null;
+    }>,
 };
 
 const queries = {
   fetchPrice: (args: { code: string }) =>
     (_client as any).queries.fetchPrice(args) as Promise<{
       data: { code: string | null; price: number | null; currency: string | null; cached: boolean | null; error: string | null } | null;
+    }>,
+  stripeCreateCheckout: (args?: { returnUrl?: string }) =>
+    (_client as any).queries.stripeCreateCheckout(args ?? {}) as Promise<{
+      data: { url: string | null; error: string | null } | null;
+    }>,
+  stripeCreatePortal: (args?: { returnUrl?: string }) =>
+    (_client as any).queries.stripeCreatePortal(args ?? {}) as Promise<{
+      data: { url: string | null; error: string | null } | null;
     }>,
 };
 /* eslint-enable @typescript-eslint/no-explicit-any */

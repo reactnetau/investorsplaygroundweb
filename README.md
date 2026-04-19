@@ -131,6 +131,14 @@ frontend:
 
 Set `VITE_APP_URL` in Amplify Console → Environment variables with your deployed domain.
 
+For React Router routes such as `/dashboard`, add an Amplify Hosting rewrite rule:
+
+| Source address | Target address | Type |
+|---|---|---|
+| `</^[^.]+$|\.(?!(css|gif|ico|jpg|js|png|txt|svg|woff|ttf|map|json)$)([^.]+$)/>` | `/index.html` | `200 (Rewrite)` |
+
+The Amplify app should be connected to this `investorsplaygroundweb` repository only. Do not point this frontend app at `investorsplaygroundbackend` as a full-stack Amplify app unless you intentionally want backend deployment from that repo.
+
 ---
 
 ## Architecture notes

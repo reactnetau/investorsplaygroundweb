@@ -15,6 +15,8 @@ import { PortfoliosPage } from './pages/PortfoliosPage';
 import { HoldingsPage } from './pages/HoldingsPage';
 import { AccountPage } from './pages/AccountPage';
 import { SettingsPage } from './pages/SettingsPage';
+import { StripeSuccessPage } from './pages/StripeSuccessPage';
+import { StripeCancelPage } from './pages/StripeCancelPage';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -34,6 +36,8 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
+      <Route path="/stripe-success" element={<StripeSuccessPage />} />
+      <Route path="/stripe-cancel" element={<StripeCancelPage />} />
 
       <Route element={<AuthLayout />}>
         <Route path="/login"          element={<GuestOnlyRoute><LoginPage /></GuestOnlyRoute>} />

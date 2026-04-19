@@ -1,4 +1,7 @@
+import { useState } from 'react';
 import { TrendingUp, Star } from 'lucide-react';
+import { client } from '../lib/api';
+import { enqueueSnackbar } from 'notistack';
 
 interface Props {
   open: boolean;
@@ -7,6 +10,26 @@ interface Props {
 }
 
 export function ProModal({ open, reason, onClose }: Props) {
+  const [loading, setLoading] = useState(false);
+
+  const handleUpgrade = async () => {
+    setLoading(true);
+    try {
+      const result = await client.queries.stripeCreateCheckout({
+        returnUrl: window.location.origin,
+      });
+      if (result.data?.url) {
+        window.location.href = result.data.url;
+      } else {
+        enqueueSnackbar(result.data?.error ?? 'Checkout failed', { variant: 'error' });
+        setLoading(false);
+      }
+    } catch {
+      enqueueSnackbar('Upgrade failed', { variant: 'error' });
+      setLoading(false);
+    }
+  };
+
   if (!open) return null;
 
   const features = [
@@ -33,11 +56,11 @@ export function ProModal({ open, reason, onClose }: Props) {
             </li>
           ))}
         </ul>
-        <p className="text-xs text-gray-400 text-center mb-4">
-          Pro subscriptions are managed through the mobile app. Download Investors Playground on iOS or Android to subscribe.
-        </p>
+        <button onClick={handleUpgrade} disabled={loading} className="btn-primary w-full mb-3">
+          {loading ? 'Redirecting…' : <><Star className="w-4 h-4" /> Subscribe to Pro</>}
+        </button>
         <button onClick={onClose} className="btn-secondary w-full">
-          Got it
+          Not now
         </button>
       </div>
     </div>
