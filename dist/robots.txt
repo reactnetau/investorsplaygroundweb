@@ -1,0 +1,7 @@
+User-agent: *
+Disallow: /dashboard
+Disallow: /portfolios
+Disallow: /holdings
+Disallow: /account
+Disallow: /settings
+Allow: /
