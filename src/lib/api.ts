@@ -170,6 +170,16 @@ const mutations = {
     (_client as any).mutations.stripeCancelSubscription({}) as Promise<{
       data: { ok: boolean | null; error: string | null } | null;
     }>,
+  deleteAccount: () =>
+    (_client as any).mutations.deleteAccount({}) as Promise<{
+      data: {
+        ok: boolean | null;
+        deletedHoldings: number | null;
+        deletedPortfolios: number | null;
+        deletedProfiles: number | null;
+        error: string | null;
+      } | null;
+    }>,
 };
 
 const queries = {

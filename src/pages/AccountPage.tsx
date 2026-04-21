@@ -83,18 +83,9 @@ export function AccountPage() {
   const handleDeleteAccount = async () => {
     setDeleteLoading(true);
     try {
-      if (profile) {
-        const portfolios = await client.models.Portfolio.list();
-        const allHoldings = await Promise.all(
-          (portfolios.data ?? []).map((p) => client.models.Holding.listByPortfolio(p.id))
-        );
-        await Promise.all([
-          ...allHoldings.flatMap((h) =>
-            (h.data ?? []).map((holding) => client.models.Holding.delete({ id: holding.id }))
-          ),
-          ...(portfolios.data ?? []).map((p) => client.models.Portfolio.delete({ id: p.id })),
-          client.models.UserProfile.delete({ id: profile.id }),
-        ]);
+      const result = await client.mutations.deleteAccount();
+      if (!result.data?.ok) {
+        throw new Error(result.data?.error ?? 'Account deletion failed');
       }
       await deleteCurrentUser();
       navigate('/');

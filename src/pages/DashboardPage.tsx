@@ -4,6 +4,7 @@ import { TrendingUp, TrendingDown, DollarSign, Briefcase, RefreshCw, Plus } from
 import { useProfile } from '../hooks/useProfile';
 import { usePortfolios } from '../hooks/usePortfolios';
 import { useHoldings } from '../hooks/useHoldings';
+import { useSelectedPortfolioIndex } from '../hooks/useSelectedPortfolioIndex';
 import { computePortfolioStats, isPro } from '../lib/api';
 import { formatCurrency, formatPercent, gainLossColor } from '../lib/format';
 import { LoadingSpinner } from '../components/LoadingSpinner';
@@ -14,7 +15,7 @@ export function DashboardPage() {
   const navigate = useNavigate();
   const { profile, loading: profileLoading, fetchProfile } = useProfile();
   const { portfolios, loading: portfoliosLoading, fetchPortfolios } = usePortfolios();
-  const [activePortfolioIndex, setActivePortfolioIndex] = useState(0);
+  const { activeIndex: activePortfolioIndex, setActiveIndex: setActivePortfolioIndex } = useSelectedPortfolioIndex(portfolios);
   const [dataLoading, setDataLoading] = useState(true);
 
   const activePortfolio = portfolios[activePortfolioIndex] ?? null;

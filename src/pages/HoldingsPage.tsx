@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { TrendingUp, TrendingDown, Plus, RefreshCw, X, Search } from 'lucide-react';
 import { usePortfolios } from '../hooks/usePortfolios';
 import { useHoldings } from '../hooks/useHoldings';
+import { useSelectedPortfolioIndex } from '../hooks/useSelectedPortfolioIndex';
 import { client, type Portfolio, type HoldingWithPnL } from '../lib/api';
 import { formatCurrency, formatPercent, formatDate, gainLossColor, gainLossBg } from '../lib/format';
 import { LoadingSpinner } from '../components/LoadingSpinner';
@@ -12,7 +13,7 @@ import { enqueueSnackbar } from 'notistack';
 
 export function HoldingsPage() {
   const { portfolios, loading: portfoliosLoading, fetchPortfolios } = usePortfolios();
-  const [activeIndex, setActiveIndex] = useState(0);
+  const { activeIndex, setActiveIndex } = useSelectedPortfolioIndex(portfolios);
   const [showBuy, setShowBuy] = useState(false);
   const [sellTarget, setSellTarget] = useState<HoldingWithPnL | null>(null);
   const [resetModal, setResetModal] = useState(false);
@@ -26,8 +27,23 @@ export function HoldingsPage() {
   const [buyCode, setBuyCode] = useState('');
   const [buyPrice, setBuyPrice] = useState('');
   const [buyQty, setBuyQty] = useState('');
+  const [buyAmount, setBuyAmount] = useState('');
   const [buyDate, setBuyDate] = useState(new Date().toISOString().split('T')[0]);
   const [buying, setBuying] = useState(false);
+
+  const parsedBuyPrice = parseFloat(buyPrice);
+  const parsedBuyQty = parseFloat(buyQty);
+  const parsedBuyAmount = parseFloat(buyAmount);
+  const hasBuyPrice = !isNaN(parsedBuyPrice) && parsedBuyPrice > 0;
+  const hasBuyQty = !isNaN(parsedBuyQty) && parsedBuyQty > 0;
+  const hasBuyAmount = !isNaN(parsedBuyAmount) && parsedBuyAmount > 0;
+  const calculatedBuyQty = hasBuyAmount && hasBuyPrice ? parsedBuyAmount / parsedBuyPrice : null;
+  const submitBuyQty = hasBuyAmount ? (calculatedBuyQty ?? NaN) : parsedBuyQty;
+  const totalCost = hasBuyAmount
+    ? parsedBuyAmount
+    : hasBuyQty && hasBuyPrice
+      ? parsedBuyQty * parsedBuyPrice
+      : null;
 
   const [sellQty, setSellQty] = useState('');
   const [selling, setSelling] = useState(false);
@@ -69,10 +85,10 @@ export function HoldingsPage() {
   const handleBuy = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!activePortfolio) return;
-    const price = parseFloat(buyPrice);
-    const qty = parseFloat(buyQty);
+    const price = parsedBuyPrice;
+    const qty = submitBuyQty;
     if (!buyCode.trim() || isNaN(price) || price <= 0 || isNaN(qty) || qty <= 0) {
-      enqueueSnackbar('Please fill in all fields', { variant: 'error' });
+      enqueueSnackbar('Please enter a stock, price, and either quantity or amount', { variant: 'error' });
       return;
     }
     setBuying(true);
@@ -88,9 +104,9 @@ export function HoldingsPage() {
       if (d?.errorCode === 'limit_reached') { setShowBuy(false); setProModal(true); return; }
       if (d?.errorCode === 'insufficient_funds') { enqueueSnackbar('Insufficient cash in portfolio', { variant: 'error' }); return; }
       if (d?.error) throw new Error(d.error);
-      enqueueSnackbar(`Bought ${qty} × ${buyCode.toUpperCase()}`, { variant: 'success' });
+      enqueueSnackbar(`Bought ${qty.toFixed(4).replace(/\.?0+$/, '')} × ${buyCode.toUpperCase()}`, { variant: 'success' });
       setShowBuy(false);
-      setBuyCode(''); setBuyPrice(''); setBuyQty('');
+      setBuyCode(''); setBuyPrice(''); setBuyQty(''); setBuyAmount('');
       setBuyDate(new Date().toISOString().split('T')[0]);
       await Promise.all([fetchHoldings(), fetchPortfolios()]);
     } catch (err) {
@@ -212,26 +228,42 @@ export function HoldingsPage() {
                     </button>
                   </div>
                 </div>
-                <div className="grid sm:grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="label">Buy price</label>
                     <input className="input" type="number" step="0.01" min="0.01" value={buyPrice}
                       onChange={(e) => setBuyPrice(e.target.value)} placeholder="0.00" required />
                   </div>
                   <div>
-                    <label className="label">Quantity</label>
-                    <input className="input" type="number" step="0.001" min="0.001" value={buyQty}
-                      onChange={(e) => setBuyQty(e.target.value)} placeholder="0" required />
-                  </div>
-                  <div>
                     <label className="label">Purchase date</label>
                     <input className="input" type="date" value={buyDate} onChange={(e) => setBuyDate(e.target.value)} required />
                   </div>
                 </div>
-                {buyPrice && buyQty && (
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="label">Quantity</label>
+                    <input
+                      className={`input ${hasBuyAmount ? 'opacity-45 bg-gray-50' : ''}`}
+                      type="number" step="0.001" min="0.001" value={buyQty}
+                      onChange={(e) => { setBuyQty(e.target.value); if (e.target.value) setBuyAmount(''); }}
+                      placeholder="0" required={!hasBuyAmount} disabled={hasBuyAmount} />
+                  </div>
+                  <div>
+                    <label className="label">Amount to spend</label>
+                    <input
+                      className={`input ${hasBuyQty ? 'opacity-45 bg-gray-50' : ''}`}
+                      type="number" step="0.01" min="0.01" value={buyAmount}
+                      onChange={(e) => { setBuyAmount(e.target.value); if (e.target.value) setBuyQty(''); }}
+                      placeholder="500.00" disabled={hasBuyQty} />
+                    {calculatedBuyQty !== null && (
+                      <p className="text-xs text-gray-400 mt-1">≈ {calculatedBuyQty.toFixed(4)} shares</p>
+                    )}
+                  </div>
+                </div>
+                {totalCost !== null && (
                   <p className="text-xs text-gray-500">
                     Total cost: <span className="font-semibold text-gray-800">
-                      {formatCurrency(parseFloat(buyPrice || '0') * parseFloat(buyQty || '0'), activePortfolio?.currency ?? 'AUD')}
+                      {formatCurrency(totalCost, activePortfolio?.currency ?? 'AUD')}
                     </span>
                   </p>
                 )}

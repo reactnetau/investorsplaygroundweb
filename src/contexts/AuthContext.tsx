@@ -7,7 +7,6 @@ import {
   confirmSignUp,
   resetPassword,
   confirmResetPassword,
-  deleteUser,
   type AuthUser,
 } from 'aws-amplify/auth';
 import { client } from '../lib/api';
@@ -89,7 +88,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const deleteCurrentUser = async () => {
-    await deleteUser();
+    await signOut();
     setUser(null);
   };
 

@@ -59,6 +59,13 @@
               "isRequired": true,
               "attributes": []
             },
+            "stripeCustomerId": {
+              "name": "stripeCustomerId",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
             "subscriptionStatus": {
               "name": "subscriptionStatus",
               "isArray": false,
@@ -139,6 +146,16 @@
                 "queryField": "listUserProfileByOwner",
                 "fields": [
                   "owner"
+                ]
+              }
+            },
+            {
+              "type": "key",
+              "properties": {
+                "name": "stripeCustomerId-index",
+                "queryField": "listUserProfileByStripeCustomerId",
+                "fields": [
+                  "stripeCustomerId"
                 ]
               }
             },
@@ -636,6 +653,63 @@
             }
           }
         },
+        "StripeCreateCheckoutReturnType": {
+          "name": "StripeCreateCheckoutReturnType",
+          "fields": {
+            "url": {
+              "name": "url",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "error": {
+              "name": "error",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            }
+          }
+        },
+        "StripeCreatePortalReturnType": {
+          "name": "StripeCreatePortalReturnType",
+          "fields": {
+            "url": {
+              "name": "url",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "error": {
+              "name": "error",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            }
+          }
+        },
+        "StripeCancelSubscriptionReturnType": {
+          "name": "StripeCancelSubscriptionReturnType",
+          "fields": {
+            "ok": {
+              "name": "ok",
+              "isArray": false,
+              "type": "Boolean",
+              "isRequired": false,
+              "attributes": []
+            },
+            "error": {
+              "name": "error",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            }
+          }
+        },
         "SyncSubscriptionStateReturnType": {
           "name": "SyncSubscriptionStateReturnType",
           "fields": {
@@ -684,6 +758,38 @@
               "isArray": false,
               "type": "String",
               "isRequired": true
+            }
+          }
+        },
+        "stripeCreateCheckout": {
+          "name": "stripeCreateCheckout",
+          "isArray": false,
+          "type": {
+            "nonModel": "StripeCreateCheckoutReturnType"
+          },
+          "isRequired": false,
+          "arguments": {
+            "returnUrl": {
+              "name": "returnUrl",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false
+            }
+          }
+        },
+        "stripeCreatePortal": {
+          "name": "stripeCreatePortal",
+          "isArray": false,
+          "type": {
+            "nonModel": "StripeCreatePortalReturnType"
+          },
+          "isRequired": false,
+          "arguments": {
+            "returnUrl": {
+              "name": "returnUrl",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false
             }
           }
         }
@@ -844,6 +950,14 @@
               "isRequired": true
             }
           }
+        },
+        "stripeCancelSubscription": {
+          "name": "stripeCancelSubscription",
+          "isArray": false,
+          "type": {
+            "nonModel": "StripeCancelSubscriptionReturnType"
+          },
+          "isRequired": false
         },
         "syncSubscriptionState": {
           "name": "syncSubscriptionState",
