@@ -65,9 +65,11 @@ export function DashboardPage() {
 
       {/* Plan badge */}
       {profile && (
-        <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold mb-5 border ${pro ? 'badge-pro' : 'badge-free'}`}>
+        <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold mb-5 border ${
+          profile.isFoundingMember ? 'bg-amber-50 border-amber-200 text-amber-800' : pro ? 'badge-pro' : 'badge-free'
+        }`}>
           <TrendingUp className="w-3 h-3" />
-          {pro ? 'Pro plan' : `Free plan · 1 portfolio, up to 5 holdings`}
+          {profile.isFoundingMember ? 'Founding member · Pro forever' : pro ? 'Pro plan' : 'Free plan · 1 portfolio, up to 5 holdings'}
         </div>
       )}
 

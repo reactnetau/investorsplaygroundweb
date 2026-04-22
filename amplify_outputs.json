@@ -115,6 +115,13 @@
               "isRequired": false,
               "attributes": []
             },
+            "isFoundingMember": {
+              "name": "isFoundingMember",
+              "isArray": false,
+              "type": "Boolean",
+              "isRequired": false,
+              "attributes": []
+            },
             "createdAt": {
               "name": "createdAt",
               "isArray": false,
@@ -474,6 +481,13 @@
               "isRequired": false,
               "attributes": []
             },
+            "isFoundingMember": {
+              "name": "isFoundingMember",
+              "isArray": false,
+              "type": "Boolean",
+              "isRequired": false,
+              "attributes": []
+            },
             "error": {
               "name": "error",
               "isArray": false,
@@ -710,6 +724,112 @@
             }
           }
         },
+        "DeleteAccountReturnType": {
+          "name": "DeleteAccountReturnType",
+          "fields": {
+            "ok": {
+              "name": "ok",
+              "isArray": false,
+              "type": "Boolean",
+              "isRequired": false,
+              "attributes": []
+            },
+            "deletedHoldings": {
+              "name": "deletedHoldings",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false,
+              "attributes": []
+            },
+            "deletedPortfolios": {
+              "name": "deletedPortfolios",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false,
+              "attributes": []
+            },
+            "deletedProfiles": {
+              "name": "deletedProfiles",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false,
+              "attributes": []
+            },
+            "error": {
+              "name": "error",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            }
+          }
+        },
+        "StripeGetPriceReturnType": {
+          "name": "StripeGetPriceReturnType",
+          "fields": {
+            "priceString": {
+              "name": "priceString",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "interval": {
+              "name": "interval",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "error": {
+              "name": "error",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            }
+          }
+        },
+        "GetFoundingMemberStatusReturnType": {
+          "name": "GetFoundingMemberStatusReturnType",
+          "fields": {
+            "enabled": {
+              "name": "enabled",
+              "isArray": false,
+              "type": "Boolean",
+              "isRequired": false,
+              "attributes": []
+            },
+            "claimed": {
+              "name": "claimed",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false,
+              "attributes": []
+            },
+            "limit": {
+              "name": "limit",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false,
+              "attributes": []
+            },
+            "available": {
+              "name": "available",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false,
+              "attributes": []
+            },
+            "error": {
+              "name": "error",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            }
+          }
+        },
         "SyncSubscriptionStateReturnType": {
           "name": "SyncSubscriptionStateReturnType",
           "fields": {
@@ -792,6 +912,22 @@
               "isRequired": false
             }
           }
+        },
+        "stripeGetPrice": {
+          "name": "stripeGetPrice",
+          "isArray": false,
+          "type": {
+            "nonModel": "StripeGetPriceReturnType"
+          },
+          "isRequired": false
+        },
+        "getFoundingMemberStatus": {
+          "name": "getFoundingMemberStatus",
+          "isArray": false,
+          "type": {
+            "nonModel": "GetFoundingMemberStatusReturnType"
+          },
+          "isRequired": false
         }
       },
       "mutations": {
@@ -956,6 +1092,14 @@
           "isArray": false,
           "type": {
             "nonModel": "StripeCancelSubscriptionReturnType"
+          },
+          "isRequired": false
+        },
+        "deleteAccount": {
+          "name": "deleteAccount",
+          "isArray": false,
+          "type": {
+            "nonModel": "DeleteAccountReturnType"
           },
           "isRequired": false
         },

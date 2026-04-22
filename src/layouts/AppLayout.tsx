@@ -3,6 +3,7 @@ import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Briefcase, TrendingUp, User, Settings, LogOut, Menu, X } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { enqueueSnackbar } from 'notistack';
+import schmappsLogo from '../assets/schmappslogo.png';
 
 const navItems = [
   { to: '/dashboard',  icon: LayoutDashboard, label: 'Dashboard' },
@@ -39,9 +40,7 @@ export function AppLayout() {
   const Sidebar = ({ mobile = false }: { mobile?: boolean }) => (
     <nav className={`flex min-h-0 flex-col h-full ${mobile ? 'pt-2' : ''}`}>
       <div className="px-4 py-5 flex items-center gap-2.5 border-b border-gray-100">
-        <div className="w-8 h-8 rounded-[10px] bg-brand-600 flex items-center justify-center flex-shrink-0">
-          <TrendingUp className="w-4 h-4 text-white" />
-        </div>
+        <img src={schmappsLogo} alt="Schmapps" className="w-8 h-8 object-contain flex-shrink-0" />
         <span className="font-bold text-gray-900 text-sm">Investors Playground</span>
       </div>
 
@@ -101,9 +100,7 @@ export function AppLayout() {
             <Menu className="w-5 h-5 text-gray-600" />
           </button>
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-[8px] bg-brand-600 flex items-center justify-center">
-              <TrendingUp className="w-3 h-3 text-white" />
-            </div>
+            <img src={schmappsLogo} alt="Schmapps" className="w-6 h-6 object-contain" />
             <span className="font-bold text-gray-900 text-sm">Investors Playground</span>
           </div>
         </header>

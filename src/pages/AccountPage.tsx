@@ -24,6 +24,7 @@ export function AccountPage() {
   useEffect(() => { fetchProfile(); }, [fetchProfile]);
 
   const pro = profile ? isPro(profile) : false;
+  const isFoundingMember = profile?.isFoundingMember === true;
   const isMobileSubscription = profile?.subscriptionProvider === 'revenuecat';
 
   const handleUpgrade = async () => {
@@ -121,9 +122,9 @@ export function AccountPage() {
           </div>
           <div className="flex justify-between">
             <span className="text-gray-500">Membership</span>
-            <span className={`inline-flex items-center gap-1 font-semibold ${pro ? 'text-brand-600' : 'text-gray-600'}`}>
+            <span className={`inline-flex items-center gap-1 font-semibold ${isFoundingMember ? 'text-amber-600' : pro ? 'text-brand-600' : 'text-gray-600'}`}>
               <Star className="w-3.5 h-3.5" />
-              {pro ? 'Pro' : 'Free'}
+              {isFoundingMember ? 'Founding member' : pro ? 'Pro' : 'Free'}
             </span>
           </div>
           {profile?.subscriptionStatus && profile.subscriptionStatus !== 'inactive' && (
@@ -139,7 +140,13 @@ export function AccountPage() {
       <div className="card p-6 mb-4">
         <h2 className="text-base font-semibold text-gray-900 mb-4">Subscription</h2>
 
-        {pro ? (
+        {isFoundingMember ? (
+          <div className="space-y-3">
+            <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-800">
+              <strong>Founding member</strong> — you have Pro access free forever. Thank you for being one of our first members.
+            </div>
+          </div>
+        ) : pro ? (
           <div className="space-y-3">
             <p className="text-sm text-gray-600">
               You're on the <strong>Pro plan</strong> — unlimited portfolios and holdings.
@@ -184,17 +191,17 @@ export function AccountPage() {
         </h2>
         <p className="text-sm text-gray-500 mb-4">
           Deleting your account is permanent and cannot be undone. All portfolios and holdings will be lost.
-          {pro && !isMobileSubscription && ' Cancel your subscription first before deleting.'}
+          {pro && !isMobileSubscription && !isFoundingMember && ' Cancel your subscription first before deleting.'}
         </p>
         <button
           onClick={() => setDeleteModal(true)}
-          disabled={pro && !isMobileSubscription}
+          disabled={pro && !isMobileSubscription && !isFoundingMember}
           className="btn-danger"
-          title={pro && !isMobileSubscription ? 'Cancel your subscription before deleting your account' : ''}
+          title={pro && !isMobileSubscription && !isFoundingMember ? 'Cancel your subscription before deleting your account' : ''}
         >
           <Trash2 className="w-4 h-4" /> Delete account
         </button>
-        {pro && !isMobileSubscription && (
+        {pro && !isMobileSubscription && !isFoundingMember && (
           <p className="text-xs text-gray-400 mt-2">Cancel your subscription first to enable account deletion.</p>
         )}
       </div>

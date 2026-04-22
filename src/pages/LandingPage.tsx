@@ -1,6 +1,10 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { TrendingUp, BarChart2, DollarSign, ShieldCheck, ArrowRight, Check } from 'lucide-react';
 import { SEO } from '../components/SEO';
+import schmappsLogo from '../assets/schmappslogo.png';
+import { client } from '../lib/api';
+import { FoundingMembersWidget } from '../components/FoundingMembersWidget';
 
 const APP_URL = import.meta.env.VITE_APP_URL ?? '';
 
@@ -34,6 +38,20 @@ const ACTIVITY = [
 ];
 
 export function LandingPage() {
+  const [proPrice, setProPrice] = useState<string | null>(null);
+  const [priceInterval, setPriceInterval] = useState<string>('month');
+
+  useEffect(() => {
+    client.queries.stripeGetPrice()
+      .then(r => {
+        if (r.data?.priceString) {
+          setProPrice(r.data.priceString);
+          if (r.data.interval) setPriceInterval(r.data.interval);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--color-bg)' }}>
       <SEO
@@ -46,9 +64,7 @@ export function LandingPage() {
       <header className="border-b border-gray-200 bg-white/80 backdrop-blur-md sticky top-0 z-30">
         <div className="max-w-5xl mx-auto px-5 h-14 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-[8px] bg-brand-600 flex items-center justify-center">
-              <TrendingUp className="w-3.5 h-3.5 text-white" />
-            </div>
+            <img src={schmappsLogo} alt="Schmapps" className="w-7 h-7 object-contain" />
             <span className="font-bold text-gray-900 text-sm">Investors Playground</span>
           </Link>
           <div className="flex items-center gap-2">
@@ -160,7 +176,10 @@ export function LandingPage() {
       <section className="bg-white border-y border-gray-200 py-16">
         <div className="max-w-3xl mx-auto px-5">
           <h2 className="text-2xl font-bold text-gray-900 text-center mb-2">Simple pricing</h2>
-          <p className="text-sm text-gray-500 text-center mb-10">Start free. Upgrade through the mobile app.</p>
+          <p className="text-sm text-gray-500 text-center mb-10">Start free. Upgrade here or through the mobile app.</p>
+          <div className="mb-6">
+            <FoundingMembersWidget />
+          </div>
           <div className="grid sm:grid-cols-2 gap-5">
             {[
               {
@@ -174,9 +193,9 @@ export function LandingPage() {
               },
               {
                 name: 'Pro',
-                price: 'From app',
-                period: 'via iOS/Android',
-                features: ['Unlimited portfolios', 'Unlimited holdings', 'Live price refresh', 'Advanced analytics'],
+                price: proPrice ?? '—',
+                period: proPrice ? `per ${priceInterval} · iOS, Android & web` : 'purchase in this app, on iOS or Android',
+                features: ['Unlimited portfolios', 'Unlimited holdings', 'Use on iOS, Android & web'],
                 cta: 'Sign up first',
                 to: '/signup',
                 primary: true,
@@ -217,9 +236,7 @@ export function LandingPage() {
       <footer className="border-t border-gray-200 bg-white">
         <div className="max-w-5xl mx-auto px-5 py-6 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded-[6px] bg-brand-600 flex items-center justify-center">
-              <TrendingUp className="w-3 h-3 text-white" />
-            </div>
+            <img src={schmappsLogo} alt="Schmapps" className="w-5 h-5 object-contain" />
             <span className="text-sm font-semibold text-gray-700">Investors Playground</span>
           </div>
           <p className="text-xs text-gray-400">Paper trading only. Not financial advice.</p>

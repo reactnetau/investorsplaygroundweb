@@ -1,14 +1,12 @@
 import { Outlet, Link } from 'react-router-dom';
-import { TrendingUp } from 'lucide-react';
+import schmappsLogo from '../assets/schmappslogo.png';
 
 export function AuthLayout() {
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--color-bg)' }}>
       <header className="px-6 py-5">
         <Link to="/" className="inline-flex items-center gap-2.5 hover:opacity-80 transition-opacity">
-          <div className="w-8 h-8 rounded-[10px] bg-brand-600 flex items-center justify-center">
-            <TrendingUp className="w-4 h-4 text-white" />
-          </div>
+          <img src={schmappsLogo} alt="Schmapps" className="w-8 h-8 object-contain" />
           <span className="font-bold text-gray-900 text-sm">Investors Playground</span>
         </Link>
       </header>

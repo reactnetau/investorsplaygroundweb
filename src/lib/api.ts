@@ -22,6 +22,7 @@ export interface UserProfile {
   revenueCatAppUserId?: string | null;
   currency: string;
   activePortfolioId?: string | null;
+  isFoundingMember?: boolean | null;
   createdAt?: string | null;
   updatedAt?: string | null;
 }
@@ -187,6 +188,10 @@ const queries = {
     (_client as any).queries.fetchPrice(args) as Promise<{
       data: { code: string | null; price: number | null; currency: string | null; cached: boolean | null; error: string | null } | null;
     }>,
+  stripeGetPrice: () =>
+    (_client as any).queries.stripeGetPrice({}, { authMode: 'iam' }) as Promise<{
+      data: { priceString: string | null; interval: string | null; error: string | null } | null;
+    }>,
   stripeCreateCheckout: (args?: { returnUrl?: string }) =>
     (_client as any).queries.stripeCreateCheckout(args ?? {}) as Promise<{
       data: { url: string | null; error: string | null } | null;
@@ -194,6 +199,10 @@ const queries = {
   stripeCreatePortal: (args?: { returnUrl?: string }) =>
     (_client as any).queries.stripeCreatePortal(args ?? {}) as Promise<{
       data: { url: string | null; error: string | null } | null;
+    }>,
+  getFoundingMemberStatus: () =>
+    (_client as any).queries.getFoundingMemberStatus({}, { authMode: 'iam' }) as Promise<{
+      data: { enabled: boolean | null; claimed: number | null; limit: number | null; available: number | null; error: string | null } | null;
     }>,
 };
 /* eslint-enable @typescript-eslint/no-explicit-any */
