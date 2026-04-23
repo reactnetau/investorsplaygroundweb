@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { TrendingUp, TrendingDown, Plus, RefreshCw, X, Search } from 'lucide-react';
+import { TrendingUp, TrendingDown, Plus, RefreshCw, X } from 'lucide-react';
 import { usePortfolios } from '../hooks/usePortfolios';
 import { useHoldings } from '../hooks/useHoldings';
 import { useSelectedPortfolioIndex } from '../hooks/useSelectedPortfolioIndex';
@@ -47,7 +47,6 @@ export function HoldingsPage() {
   const [buyPrice, setBuyPrice] = useState('');
   const [buyQty, setBuyQty] = useState('');
   const [buyAmount, setBuyAmount] = useState('');
-  const [buyDate, setBuyDate] = useState(new Date().toISOString().split('T')[0]);
   const [buying, setBuying] = useState(false);
 
   const selectedMarket = MARKET_OPTIONS.find(o => o.value === buyMarket)!;
@@ -129,7 +128,7 @@ export function HoldingsPage() {
         code: normalizedCode,
         buyPrice: price,
         quantity: qty,
-        purchasedOn: new Date(buyDate).toISOString(),
+        purchasedOn: new Date().toISOString(),
       });
       const d = result.data;
       if (d?.errorCode === 'limit_reached') { setShowBuy(false); setProModal(true); return; }
@@ -138,7 +137,6 @@ export function HoldingsPage() {
       enqueueSnackbar(`Bought ${qty.toFixed(4).replace(/\.?0+$/, '')} × ${normalizedCode}`, { variant: 'success' });
       setShowBuy(false);
       setBuyCode(''); setBuyPrice(''); setBuyQty(''); setBuyAmount('');
-      setBuyDate(new Date().toISOString().split('T')[0]);
       await Promise.all([fetchHoldings(), fetchPortfolios()]);
     } catch (err) {
       enqueueSnackbar(err instanceof Error ? err.message : 'Buy failed', { variant: 'error' });
@@ -273,8 +271,8 @@ export function HoldingsPage() {
                     <input className="input flex-1" value={buyCode} onChange={(e) => setBuyCode(e.target.value.toUpperCase())}
                       placeholder={selectedMarket.placeholder} required />
                     <button type="button" onClick={handleFetchPrice} disabled={priceLoading || !buyCode.trim()}
-                      className="btn-secondary !py-2 !px-3 flex-shrink-0" title="Fetch live price">
-                      {priceLoading ? <LoadingSpinner size="sm" /> : <Search className="w-4 h-4" />}
+                      className="btn-secondary !py-2 !px-4 flex-shrink-0 text-sm font-semibold">
+                      {priceLoading ? <LoadingSpinner size="sm" /> : 'Look up'}
                     </button>
                   </div>
                 </div>
@@ -286,7 +284,9 @@ export function HoldingsPage() {
                   </div>
                   <div>
                     <label className="label">Purchase date</label>
-                    <input className="input" type="date" value={buyDate} onChange={(e) => setBuyDate(e.target.value)} required />
+                    <p className="input bg-gray-50 text-gray-500 cursor-default select-none">
+                      {new Date().toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })}
+                    </p>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
