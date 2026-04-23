@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { TrendingUp, BarChart2, DollarSign, ShieldCheck, ArrowRight, Check } from 'lucide-react';
+import { TrendingUp, BarChart2, DollarSign, ShieldCheck, ArrowRight, Check, Apple, Monitor, Smartphone } from 'lucide-react';
 import { SEO } from '../components/SEO';
 import schmappsLogo from '../assets/schmappslogo.png';
 import { client } from '../lib/api';
@@ -37,9 +37,18 @@ const ACTIVITY = [
   { title: 'Portfolio created', meta: 'Growth Strategy', dot: 'bg-blue-500' },
 ];
 
+const platforms = [
+  { label: 'iOS', icon: Apple },
+  { label: 'Android', icon: Smartphone },
+  { label: 'Web', icon: Monitor },
+];
+
+interface FoundingStatus { claimed: number; limit: number; available: number; }
+
 export function LandingPage() {
   const [proPrice, setProPrice] = useState<string | null>(null);
   const [priceInterval, setPriceInterval] = useState<string>('month');
+  const [foundingStatus, setFoundingStatus] = useState<FoundingStatus | null>(null);
 
   useEffect(() => {
     client.queries.stripeGetPrice()
@@ -47,6 +56,13 @@ export function LandingPage() {
         if (r.data?.priceString) {
           setProPrice(r.data.priceString);
           if (r.data.interval) setPriceInterval(r.data.interval);
+        }
+        if (r.data?.foundingMembersEnabled) {
+          setFoundingStatus({
+            claimed: r.data.foundingMembersClaimed ?? 0,
+            limit: r.data.foundingMembersLimit ?? 50,
+            available: r.data.foundingMembersAvailable ?? 50,
+          });
         }
       })
       .catch(() => {});
@@ -74,8 +90,15 @@ export function LandingPage() {
         </div>
       </header>
 
+      {/* Founding members banner */}
+      {foundingStatus && (
+        <div className="max-w-3xl mx-auto px-5 pt-6">
+          <FoundingMembersWidget {...foundingStatus} />
+        </div>
+      )}
+
       {/* Hero */}
-      <section className="max-w-5xl mx-auto px-5 pt-20 pb-16 text-center">
+      <section className="max-w-5xl mx-auto px-5 pt-10 pb-16 text-center">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-50 border border-brand-200 text-xs font-semibold text-brand-700 mb-6">
           <TrendingUp className="w-3.5 h-3.5" />
           Paper trading — free to start
@@ -95,6 +118,17 @@ export function LandingPage() {
           <Link to="/login" className="btn-secondary text-base !px-6 !py-3">
             Sign in
           </Link>
+        </div>
+        <div className="mt-6 inline-flex flex-col items-center gap-2 rounded-[8px] border border-gray-200 bg-white px-4 py-3 shadow-card">
+          <p className="text-sm font-bold text-gray-900">One account, 3 platforms</p>
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            {platforms.map(({ label, icon: Icon }) => (
+              <span key={label} className="inline-flex items-center gap-1 rounded-full bg-brand-50 px-2.5 py-1 text-xs font-bold text-brand-700">
+                <Icon className="h-3.5 w-3.5" />
+                {label}
+              </span>
+            ))}
+          </div>
         </div>
         <p className="mt-4 text-xs text-gray-400">Free plan: 1 portfolio, 5 holdings. No credit card.</p>
       </section>
@@ -177,9 +211,6 @@ export function LandingPage() {
         <div className="max-w-3xl mx-auto px-5">
           <h2 className="text-2xl font-bold text-gray-900 text-center mb-2">Simple pricing</h2>
           <p className="text-sm text-gray-500 text-center mb-10">Start free. Upgrade here or through the mobile app.</p>
-          <div className="mb-6">
-            <FoundingMembersWidget />
-          </div>
           <div className="grid sm:grid-cols-2 gap-5">
             {[
               {

@@ -189,8 +189,16 @@ const queries = {
       data: { code: string | null; price: number | null; currency: string | null; cached: boolean | null; error: string | null } | null;
     }>,
   stripeGetPrice: () =>
-    (_client as any).queries.stripeGetPrice({}, { authMode: 'iam' }) as Promise<{
-      data: { priceString: string | null; interval: string | null; error: string | null } | null;
+    (_client as any).queries.stripeGetPrice({}, { authMode: 'apiKey' }) as Promise<{
+      data: {
+        priceString: string | null;
+        interval: string | null;
+        foundingMembersEnabled: boolean | null;
+        foundingMembersClaimed: number | null;
+        foundingMembersLimit: number | null;
+        foundingMembersAvailable: number | null;
+        error: string | null;
+      } | null;
     }>,
   stripeCreateCheckout: (args?: { returnUrl?: string }) =>
     (_client as any).queries.stripeCreateCheckout(args ?? {}) as Promise<{

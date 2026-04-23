@@ -31,7 +31,7 @@ export function AppLayout() {
   const handleLogout = async () => {
     try {
       await logout();
-      navigate('/login');
+      navigate('/');
     } catch {
       enqueueSnackbar('Failed to sign out', { variant: 'error' });
     }

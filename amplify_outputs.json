@@ -28,8 +28,10 @@
   "data": {
     "url": "https://svmikvqupngefjvsa5husiqf3a.appsync-api.ap-southeast-2.amazonaws.com/graphql",
     "aws_region": "ap-southeast-2",
+    "api_key": "da2-3oldu5cnmfbv7e6fsc64wvldqu",
     "default_authorization_type": "AMAZON_COGNITO_USER_POOLS",
     "authorization_types": [
+      "API_KEY",
       "AWS_IAM"
     ],
     "model_introspection": {
@@ -778,6 +780,34 @@
               "name": "interval",
               "isArray": false,
               "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "foundingMembersEnabled": {
+              "name": "foundingMembersEnabled",
+              "isArray": false,
+              "type": "Boolean",
+              "isRequired": false,
+              "attributes": []
+            },
+            "foundingMembersClaimed": {
+              "name": "foundingMembersClaimed",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false,
+              "attributes": []
+            },
+            "foundingMembersLimit": {
+              "name": "foundingMembersLimit",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false,
+              "attributes": []
+            },
+            "foundingMembersAvailable": {
+              "name": "foundingMembersAvailable",
+              "isArray": false,
+              "type": "Int",
               "isRequired": false,
               "attributes": []
             },
