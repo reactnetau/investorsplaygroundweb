@@ -11,6 +11,24 @@ import { ProModal } from '../components/ProModal';
 import { SEO } from '../components/SEO';
 import { enqueueSnackbar } from 'notistack';
 
+type Market = 'ASX' | 'NASDAQ' | 'NSE' | 'BSE';
+
+const MARKET_OPTIONS: { value: Market; label: string; placeholder: string }[] = [
+  { value: 'ASX',    label: 'ASX (Australia)',    placeholder: 'BHP, CBA, WES' },
+  { value: 'NASDAQ', label: 'NASDAQ / NYSE (US)', placeholder: 'AAPL, MSFT, TSLA' },
+  { value: 'NSE',    label: 'NSE (India)',         placeholder: 'RELIANCE, TCS' },
+  { value: 'BSE',    label: 'BSE (India)',         placeholder: 'RELIANCE, TCS' },
+];
+
+function normalizeCodeForMarket(rawCode: string, market: Market): string {
+  const code = rawCode.trim().toUpperCase();
+  if (code.includes('.')) return code;
+  if (market === 'ASX') return `${code}.AX`;
+  if (market === 'NSE') return `${code}.NS`;
+  if (market === 'BSE') return `${code}.BO`;
+  return code;
+}
+
 export function HoldingsPage() {
   const { portfolios, loading: portfoliosLoading, fetchPortfolios } = usePortfolios();
   const { activeIndex, setActiveIndex } = useSelectedPortfolioIndex(portfolios);
@@ -24,12 +42,23 @@ export function HoldingsPage() {
   const activePortfolio: Portfolio | null = portfolios[activeIndex] ?? null;
   const { holdingsWithPnL, loading: holdingsLoading, fetchHoldings } = useHoldings(activePortfolio?.id ?? null);
 
+  const [buyMarket, setBuyMarket] = useState<Market>('ASX');
   const [buyCode, setBuyCode] = useState('');
   const [buyPrice, setBuyPrice] = useState('');
   const [buyQty, setBuyQty] = useState('');
   const [buyAmount, setBuyAmount] = useState('');
   const [buyDate, setBuyDate] = useState(new Date().toISOString().split('T')[0]);
   const [buying, setBuying] = useState(false);
+
+  const selectedMarket = MARKET_OPTIONS.find(o => o.value === buyMarket)!;
+
+  const handleMarketChange = (market: Market) => {
+    setBuyMarket(market);
+    setBuyCode('');
+    setBuyPrice('');
+    setBuyQty('');
+    setBuyAmount('');
+  };
 
   const parsedBuyPrice = parseFloat(buyPrice);
   const parsedBuyQty = parseFloat(buyQty);
@@ -68,9 +97,10 @@ export function HoldingsPage() {
 
   const handleFetchPrice = async () => {
     if (!buyCode.trim()) return;
+    const normalizedCode = normalizeCodeForMarket(buyCode, buyMarket);
     setPriceLoading(true);
     try {
-      const result = await client.queries.fetchPrice({ code: buyCode.toUpperCase() });
+      const result = await client.queries.fetchPrice({ code: normalizedCode });
       const d = result.data;
       if (d?.price != null) {
         setBuyPrice(String(d.price));
@@ -85,9 +115,10 @@ export function HoldingsPage() {
   const handleBuy = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!activePortfolio) return;
+    const normalizedCode = normalizeCodeForMarket(buyCode, buyMarket);
     const price = parsedBuyPrice;
     const qty = submitBuyQty;
-    if (!buyCode.trim() || isNaN(price) || price <= 0 || isNaN(qty) || qty <= 0) {
+    if (!normalizedCode || isNaN(price) || price <= 0 || isNaN(qty) || qty <= 0) {
       enqueueSnackbar('Please enter a stock, price, and either quantity or amount', { variant: 'error' });
       return;
     }
@@ -95,7 +126,7 @@ export function HoldingsPage() {
     try {
       const result = await client.mutations.buyHolding({
         portfolioId: activePortfolio.id,
-        code: buyCode.trim().toUpperCase(),
+        code: normalizedCode,
         buyPrice: price,
         quantity: qty,
         purchasedOn: new Date(buyDate).toISOString(),
@@ -104,7 +135,7 @@ export function HoldingsPage() {
       if (d?.errorCode === 'limit_reached') { setShowBuy(false); setProModal(true); return; }
       if (d?.errorCode === 'insufficient_funds') { enqueueSnackbar('Insufficient cash in portfolio', { variant: 'error' }); return; }
       if (d?.error) throw new Error(d.error);
-      enqueueSnackbar(`Bought ${qty.toFixed(4).replace(/\.?0+$/, '')} × ${buyCode.toUpperCase()}`, { variant: 'success' });
+      enqueueSnackbar(`Bought ${qty.toFixed(4).replace(/\.?0+$/, '')} × ${normalizedCode}`, { variant: 'success' });
       setShowBuy(false);
       setBuyCode(''); setBuyPrice(''); setBuyQty(''); setBuyAmount('');
       setBuyDate(new Date().toISOString().split('T')[0]);
@@ -218,10 +249,29 @@ export function HoldingsPage() {
               </div>
               <form onSubmit={handleBuy} className="space-y-4">
                 <div>
+                  <label className="label">Market</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {MARKET_OPTIONS.map((opt) => (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => handleMarketChange(opt.value)}
+                        className={`px-3 py-2 rounded-[8px] border text-xs font-semibold text-left transition-colors ${
+                          buyMarket === opt.value
+                            ? 'bg-brand-50 border-brand-400 text-brand-700'
+                            : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div>
                   <label className="label">Stock code</label>
                   <div className="flex gap-2">
                     <input className="input flex-1" value={buyCode} onChange={(e) => setBuyCode(e.target.value.toUpperCase())}
-                      placeholder="e.g. BHP, AAPL" required />
+                      placeholder={selectedMarket.placeholder} required />
                     <button type="button" onClick={handleFetchPrice} disabled={priceLoading || !buyCode.trim()}
                       className="btn-secondary !py-2 !px-3 flex-shrink-0" title="Fetch live price">
                       {priceLoading ? <LoadingSpinner size="sm" /> : <Search className="w-4 h-4" />}
