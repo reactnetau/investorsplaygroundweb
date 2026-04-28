@@ -274,6 +274,8 @@ export function LandingPage() {
           <div className="flex gap-4 text-xs text-gray-400">
             <Link to="/login" className="hover:text-gray-600">Sign in</Link>
             <Link to="/signup" className="hover:text-gray-600">Sign up</Link>
+            <Link to="/privacy" className="hover:text-gray-600">Privacy</Link>
+            <Link to="/terms" className="hover:text-gray-600">Terms</Link>
           </div>
         </div>
       </footer>
